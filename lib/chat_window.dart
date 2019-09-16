@@ -1,3 +1,4 @@
+import 'package:dim_app_flutter/dim/dim.dart';
 import 'package:dim_app_flutter/res.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
@@ -12,6 +13,20 @@ class ChatWindowPage extends StatefulWidget {
 }
 
 class _ChatWindowState extends State<StatefulWidget> {
+  final testData = List.generate(
+      1, (i) => _ChatData(Content(ContentType.Text, 'hello'), i % 2 == 0));
+  final _dimManager = DimManager.getInstance();
+
+  _ChatWindowState() {
+    _dimManager.addListener((content) {
+      setState(() {
+        // TODO log.info not work??
+        print('receive $content');
+        testData.add(_ChatData(content, false));
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,8 +37,17 @@ class _ChatWindowState extends State<StatefulWidget> {
           height: 1,
           color: Colors.black26,
           margin: const EdgeInsets.only(left: 8, right: 8)),
-      _ChatMessageList(),
-      _TextInputBar()
+      _ChatMessageList(testData),
+      _TextInputBar((content) {
+        // TODO show progress bar
+        _dimManager.send(content).then((value) {
+          print('send $content');
+          // TODO close progress bar
+          setState(() {
+            testData.add(_ChatData(content, true));
+          });
+        });
+      })
     ])));
   }
 }
@@ -56,39 +80,39 @@ class _Header extends StatelessWidget {
   }
 }
 
-class _ChatMessageList extends StatefulWidget {
-  @override
-  State<StatefulWidget> createState() {
-    return _ChatMessageListState();
-  }
-}
+class _ChatMessageList extends StatelessWidget {
+  final List<_ChatData> _list;
 
-class _ChatMessageListState extends State<StatefulWidget> {
+  _ChatMessageList(this._list);
+
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: ListView(
-            children:
-                List.generate(20, (i) => _ChatMessage('hello', i % 2 == 0))));
+        child: ListView(children: _list.map((d) => _ChatMessage(d)).toList()));
   }
 }
 
-class _ChatMessage extends StatelessWidget {
-  final String content;
+class _ChatData {
+  final Content content;
   final bool isSelf;
+  _ChatData(this.content, this.isSelf);
+}
 
-  _ChatMessage(this.content, this.isSelf) : super();
+class _ChatMessage extends StatelessWidget {
+  final _ChatData chatData;
+
+  _ChatMessage(this.chatData);
 
   @override
   Widget build(BuildContext context) {
     return Wrap(
-      alignment: isSelf ? WrapAlignment.end : WrapAlignment.start,
+      alignment: chatData.isSelf ? WrapAlignment.end : WrapAlignment.start,
       children: [
         Container(
             decoration: _getDecoration(),
             padding: EdgeInsets.all(8),
             margin: EdgeInsets.all(8),
-            child: Text(content))
+            child: Text(chatData.content.data))
       ],
     );
   }
@@ -96,7 +120,7 @@ class _ChatMessage extends StatelessWidget {
   Decoration _getDecoration() {
     const shadow = BoxShadow(
         color: kColorShadow, offset: Offset(3.0, 3.0), blurRadius: 6.0);
-    if (isSelf) {
+    if (chatData.isSelf) {
       return const BoxDecoration(
           color: kColorChatMessageSelf,
           borderRadius: BorderRadius.all(
@@ -114,7 +138,13 @@ class _ChatMessage extends StatelessWidget {
   }
 }
 
+typedef OnSend = void Function(Content content);
+
 class _TextInputBar extends StatelessWidget {
+  final _controller = TextEditingController();
+  final OnSend sender;
+  _TextInputBar(this.sender);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -137,19 +167,28 @@ class _TextInputBar extends StatelessWidget {
               )),
               Expanded(
                 child: Padding(
-                    padding: EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
                     child: TextField(
+                      controller: _controller,
+                      style: TextStyle(fontSize: 18),
                       decoration: InputDecoration(),
                     )),
               ),
               InkWell(
                   child: IconButton(
-                icon: Icon(Icons.send, color: kColorIcon, size: 32),
-                onPressed: () {
-                  Scaffold.of(context)
-                      .showSnackBar(SnackBar(content: Text('send')));
-                },
+                icon: const Icon(Icons.send, color: kColorIcon, size: 32),
+                onPressed: () => _sendContent(),
               )),
             ])));
+  }
+
+  _sendContent() {
+    if (_controller.text.isEmpty) {
+      return;
+    }
+    var content = Content(ContentType.Text, _controller.text);
+    _controller.clear();
+    print('try to send $content');
+    sender(content);
   }
 }
