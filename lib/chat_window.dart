@@ -13,18 +13,32 @@ class ChatWindowPage extends StatefulWidget {
   }
 }
 
-class _ChatWindowPageState extends State<StatefulWidget> {
+class _ChatWindowPageState extends State<StatefulWidget>
+    with WidgetsBindingObserver {
   final testData = List.generate(
-      6, (i) => _ChatData(Content(ContentType.Text, 'hello'), i % 2 == 0));
+      5,
+      (i) =>
+          _ChatData(Content(ContentType.Text, 'hello ${i + 1}'), i % 2 == 0));
   final _dimManager = DimManager.getInstance();
+  final _scrollController = ScrollController();
+  OnReceive _listener;
 
-  _ChatWindowPageState() {
-    _dimManager.addListener((content) {
+  @override
+  void initState() {
+    super.initState();
+    _listener = (content) {
       setState(() {
         log.info('receive $content');
         testData.add(_ChatData(content, false));
       });
-    });
+    };
+    _dimManager.addListener(_listener);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _dimManager.removeListener(_listener);
   }
 
   @override
