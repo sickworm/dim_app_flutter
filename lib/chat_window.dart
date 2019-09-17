@@ -1,5 +1,6 @@
 import 'package:dim_app_flutter/dim/dim.dart';
 import 'package:dim_app_flutter/res.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
@@ -8,20 +9,19 @@ final Logger log = new Logger('ChatWindowPage');
 class ChatWindowPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _ChatWindowState();
+    return _ChatWindowPageState();
   }
 }
 
-class _ChatWindowState extends State<StatefulWidget> {
+class _ChatWindowPageState extends State<StatefulWidget> {
   final testData = List.generate(
-      1, (i) => _ChatData(Content(ContentType.Text, 'hello'), i % 2 == 0));
+      6, (i) => _ChatData(Content(ContentType.Text, 'hello'), i % 2 == 0));
   final _dimManager = DimManager.getInstance();
 
-  _ChatWindowState() {
+  _ChatWindowPageState() {
     _dimManager.addListener((content) {
       setState(() {
-        // TODO log.info not work??
-        print('receive $content');
+        log.info('receive $content');
         testData.add(_ChatData(content, false));
       });
     });
@@ -39,12 +39,14 @@ class _ChatWindowState extends State<StatefulWidget> {
           margin: const EdgeInsets.only(left: 8, right: 8)),
       _ChatMessageList(testData),
       _TextInputBar((content) {
-        // TODO show progress bar
+        var chatData = _ChatData(content, true, isLoading: true);
+        setState(() {
+          testData.add(chatData);
+        });
         _dimManager.send(content).then((value) {
           print('send $content');
-          // TODO close progress bar
           setState(() {
-            testData.add(_ChatData(content, true));
+            chatData.isLoading = false;
           });
         });
       })
@@ -95,7 +97,8 @@ class _ChatMessageList extends StatelessWidget {
 class _ChatData {
   final Content content;
   final bool isSelf;
-  _ChatData(this.content, this.isSelf);
+  bool isLoading;
+  _ChatData(this.content, this.isSelf, {this.isLoading = false});
 }
 
 class _ChatMessage extends StatelessWidget {
@@ -105,15 +108,29 @@ class _ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      alignment: chatData.isSelf ? WrapAlignment.end : WrapAlignment.start,
-      children: [
-        Container(
-            decoration: _getDecoration(),
-            padding: EdgeInsets.all(8),
-            margin: EdgeInsets.all(8),
-            child: Text(chatData.content.data))
-      ],
+    var items = <Widget>[];
+    if (chatData.isSelf) {
+      items.add(const Flexible(fit: FlexFit.tight, child: SizedBox()));
+      if (chatData.isLoading) {
+        items.add(CupertinoActivityIndicator());
+      }
+    }
+
+    items.add(Container(
+        decoration: _getDecoration(),
+        padding: EdgeInsets.all(8),
+        margin: EdgeInsets.all(8),
+        child: Text(chatData.content.data)));
+
+    if (!chatData.isSelf) {
+      if (chatData.isLoading) {
+        items.add(CupertinoActivityIndicator());
+      }
+      items.add(const Flexible(fit: FlexFit.tight, child: SizedBox()));
+    }
+
+    return Row(
+      children: items,
     );
   }
 
@@ -188,7 +205,6 @@ class _TextInputBar extends StatelessWidget {
     }
     var content = Content(ContentType.Text, _controller.text);
     _controller.clear();
-    print('try to send $content');
     sender(content);
   }
 }

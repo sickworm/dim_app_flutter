@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     Logger.root.level = Level.ALL;
     Logger.root.onRecord.listen((LogRecord rec) {
-      print('${rec.level.name}: ${rec.time}: ${rec.message}');
+      print('${rec.level.name}: ${rec.loggerName}: ${rec.message}');
     });
     return MaterialApp(
       title: 'Flutter Demo',
