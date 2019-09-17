@@ -16,12 +16,14 @@ class ChatWindowPage extends StatefulWidget {
 class _ChatWindowPageState extends State<StatefulWidget>
     with WidgetsBindingObserver {
   final testData = List.generate(
-      5,
+      20,
       (i) =>
           _ChatData(Content(ContentType.Text, 'hello ${i + 1}'), i % 2 == 0));
   final _dimManager = DimManager.getInstance();
   final _scrollController = ScrollController();
   OnReceive _listener;
+  bool _needScroll = false;
+  bool _needJump = true;
 
   @override
   void initState() {
@@ -30,6 +32,7 @@ class _ChatWindowPageState extends State<StatefulWidget>
       setState(() {
         log.info('receive $content');
         testData.add(_ChatData(content, false));
+        _needScroll = true;
       });
     };
     _dimManager.addListener(_listener);
@@ -43,6 +46,7 @@ class _ChatWindowPageState extends State<StatefulWidget>
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
     return Scaffold(
         body: SafeArea(
             child: Column(children: [
@@ -51,11 +55,12 @@ class _ChatWindowPageState extends State<StatefulWidget>
           height: 1,
           color: Colors.black26,
           margin: const EdgeInsets.only(left: 8, right: 8)),
-      _ChatMessageList(testData),
+      _ChatMessageList(testData, _scrollController),
       _TextInputBar((content) {
         var chatData = _ChatData(content, true, isLoading: true);
         setState(() {
           testData.add(chatData);
+          _needScroll = true;
         });
         _dimManager.send(content).then((value) {
           print('send $content');
@@ -65,6 +70,18 @@ class _ChatWindowPageState extends State<StatefulWidget>
         });
       })
     ])));
+  }
+
+  _scrollToEnd() async {
+    if (_needJump) {
+      _needJump = false;
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    }
+    if (_needScroll) {
+      _needScroll = false;
+      _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+          duration: Duration(milliseconds: 400), curve: Curves.ease);
+    }
   }
 }
 
@@ -98,13 +115,16 @@ class _Header extends StatelessWidget {
 
 class _ChatMessageList extends StatelessWidget {
   final List<_ChatData> _list;
+  final ScrollController _scrollController;
 
-  _ChatMessageList(this._list);
+  _ChatMessageList(this._list, this._scrollController);
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: ListView(children: _list.map((d) => _ChatMessage(d)).toList()));
+        child: ListView(
+            controller: _scrollController,
+            children: _list.map((d) => _ChatMessage(d)).toList()));
   }
 }
 
