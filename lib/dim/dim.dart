@@ -27,8 +27,7 @@ class EchoDimClient extends DimClient {
   @override
   Future<void> send(Content content) {
     return Future.delayed(Duration(milliseconds: 1000), () {
-      // TODO check this out
-      Future.delayed(Duration(microseconds: 1000), () {
+      Future.delayed(Duration(milliseconds: 1000), () {
         receive(Content(ContentType.Text, content.data));
       });
     });
