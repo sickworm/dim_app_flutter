@@ -1,6 +1,6 @@
-import 'package:dim_app_flutter/chat_list.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'main_tab.dart';
 import 'res.dart';
 
 class LoadingPage extends StatefulWidget {
@@ -18,8 +18,8 @@ class _LoadingPageState extends State<LoadingPage> {
     if (!_triggered) {
       _triggered = true;
       Timer(Duration(seconds: 2), () {
-        Navigator.push(context,
-            new MaterialPageRoute(builder: (context) => ChatListPage()));
+        Navigator.pushReplacement(
+            context, new MaterialPageRoute(builder: (context) => MainTab()));
       });
     }
     return Scaffold(
