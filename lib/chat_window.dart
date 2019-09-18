@@ -207,6 +207,7 @@ typedef OnSend = void Function(Content content);
 
 class _TextInputBar extends StatelessWidget {
   final _controller = TextEditingController();
+  final _focusNode = FocusNode();
   final OnSend sender;
   _TextInputBar(this.sender);
 
@@ -231,14 +232,18 @@ class _TextInputBar extends StatelessWidget {
                 },
               )),
               Expanded(
-                child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: TextField(
-                      controller: _controller,
-                      style: TextStyle(fontSize: 18),
-                      decoration: InputDecoration(),
-                    )),
-              ),
+                  child: Padding(
+                padding: const EdgeInsets.all(8),
+                child: TextField(
+                    focusNode: _focusNode,
+                    controller: _controller,
+                    style: TextStyle(fontSize: 18),
+                    decoration: InputDecoration(),
+                    onSubmitted: (value) {
+                      FocusScope.of(context).requestFocus(_focusNode);
+                      _sendContent();
+                    }),
+              )),
               InkWell(
                   child: IconButton(
                 icon: const Icon(Icons.send, color: kColorIcon, size: 32),
