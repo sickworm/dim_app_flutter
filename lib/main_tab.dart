@@ -19,7 +19,6 @@ class _MainTabState extends State<MainTab> with SingleTickerProviderStateMixin {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
-      print('?????');
       setState(() {
         _tabIndex = _tabController.index;
       });
