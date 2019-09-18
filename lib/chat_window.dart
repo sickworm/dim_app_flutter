@@ -2,6 +2,7 @@ import 'package:dim_app_flutter/dim/dim.dart';
 import 'package:dim_app_flutter/res.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:keyboard_visibility/keyboard_visibility.dart';
 import 'package:logging/logging.dart';
 
 final Logger log = new Logger('ChatWindowPage');
@@ -21,55 +22,69 @@ class _ChatWindowPageState extends State<StatefulWidget>
           _ChatData(Content(ContentType.Text, 'hello ${i + 1}'), i % 2 == 0));
   final _dimManager = DimManager.getInstance();
   final _scrollController = ScrollController();
-  OnReceive _listener;
+  OnReceive _dimListener;
+  int _keyboardListenerId;
   bool _needScroll = false;
   bool _needJump = true;
 
   @override
   void initState() {
     super.initState();
-    _listener = (content) {
+    _dimListener = (content) {
       setState(() {
         log.info('receive $content');
         testData.add(_ChatData(content, false));
         _needScroll = true;
       });
     };
-    _dimManager.addListener(_listener);
+    _dimManager.addListener(_dimListener);
+
+    _keyboardListenerId = KeyboardVisibilityNotification().addNewListener(
+      onChange: (bool visible) {
+        print('??? $visible');
+        if (visible) {
+          setState(() {
+            _needScroll = true;
+          });
+        }
+      },
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
-    _dimManager.removeListener(_listener);
+    _dimManager.removeListener(_dimListener);
+    KeyboardVisibilityNotification().removeListener(_keyboardListenerId);
   }
 
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToEnd());
     return Scaffold(
+        resizeToAvoidBottomInset: true,
         body: SafeArea(
             child: Column(children: [
-      _Header('Sickworm'),
-      Container(
-          height: 1,
-          color: Colors.black26,
-          margin: const EdgeInsets.only(left: 8, right: 8)),
-      _ChatMessageList(testData, _scrollController),
-      _TextInputBar((content) {
-        var chatData = _ChatData(content, true, isLoading: true);
-        setState(() {
-          testData.add(chatData);
-          _needScroll = true;
-        });
-        _dimManager.send(content).then((value) {
-          print('send $content');
-          setState(() {
-            chatData.isLoading = false;
-          });
-        });
-      })
-    ])));
+          _Header('Sickworm'),
+          Container(
+              height: 1,
+              color: Colors.black26,
+              margin: const EdgeInsets.only(left: 8, right: 8)),
+          _ChatMessageList(testData, _scrollController),
+          _TextInputBar((content) {
+            var chatData = _ChatData(content, true, isLoading: true);
+            setState(() {
+              testData.add(chatData);
+              _needScroll = true;
+            });
+            _dimManager.send(content).then((value) {
+              print('send $content');
+              setState(() {
+                chatData.isLoading = false;
+              });
+            });
+          })
+        ])));
   }
 
   _scrollToEnd() async {
