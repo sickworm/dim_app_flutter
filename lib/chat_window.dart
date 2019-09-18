@@ -41,7 +41,6 @@ class _ChatWindowPageState extends State<StatefulWidget>
 
     _keyboardListenerId = KeyboardVisibilityNotification().addNewListener(
       onChange: (bool visible) {
-        print('??? $visible');
         if (visible) {
           setState(() {
             _needScroll = true;
