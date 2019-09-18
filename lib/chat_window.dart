@@ -205,14 +205,28 @@ class _ChatMessage extends StatelessWidget {
 
 typedef OnSend = void Function(Content content);
 
-class _TextInputBar extends StatelessWidget {
-  final _controller = TextEditingController();
-  final _focusNode = FocusNode();
+class _TextInputBar extends StatefulWidget {
   final OnSend sender;
+
   _TextInputBar(this.sender);
 
   @override
+  State<StatefulWidget> createState() {
+    return _TextInputBarState();
+  }
+}
+
+class _TextInputBarState extends State<_TextInputBar> {
+  final _controller = TextEditingController();
+  final _focusNode = FocusNode();
+
+  String _currentText = '';
+
+  @override
   Widget build(BuildContext context) {
+    _controller
+      ..text = _currentText
+      ..selection = TextSelection.collapsed(offset: _currentText.length);
     return Container(
         width: double.infinity,
         height: 52,
@@ -239,6 +253,9 @@ class _TextInputBar extends StatelessWidget {
                     controller: _controller,
                     style: TextStyle(fontSize: 18),
                     decoration: InputDecoration(),
+                    onChanged: (value) {
+                      _currentText = value;
+                    },
                     onSubmitted: (value) {
                       FocusScope.of(context).requestFocus(_focusNode);
                       _sendContent();
@@ -257,7 +274,8 @@ class _TextInputBar extends StatelessWidget {
       return;
     }
     var content = Content(ContentType.Text, _controller.text);
+    _currentText = '';
     _controller.clear();
-    sender(content);
+    widget.sender(content);
   }
 }
