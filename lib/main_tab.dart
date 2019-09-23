@@ -1,3 +1,4 @@
+import 'package:dim_app_flutter/contact_list.dart';
 import 'package:dim_app_flutter/res.dart';
 import 'package:flutter/material.dart';
 
@@ -28,10 +29,13 @@ class _MainTabState extends State<MainTab> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: TabBarView(
-          controller: _tabController,
-          children: [ChatListPage(), ChatListPage()],
-        ),
+        body: Column(children: [
+          _Header(),
+          TabBarView(
+            controller: _tabController,
+            children: [ChatListPage(), ContactListPage()],
+          )
+        ]),
         bottomNavigationBar: BottomNavigationBar(
             items: [
               const BottomNavigationBarItem(
@@ -53,5 +57,33 @@ class _MainTabState extends State<MainTab> with SingleTickerProviderStateMixin {
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+}
+
+class _Header extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.all(12),
+        child: Row(children: [
+          CircleAvatar(
+            backgroundImage: NetworkImage(
+              'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
+            ),
+            backgroundColor: Colors.transparent,
+            radius: 32,
+          ),
+          const Padding(
+              padding: EdgeInsets.only(left: 12),
+              child: Text('Sickworm', style: const TextStyle(fontSize: 28))),
+          const Flexible(fit: FlexFit.tight, child: SizedBox()),
+          IconButton(
+            icon: Icon(Icons.add, size: 32),
+            onPressed: () {
+              Scaffold.of(context)
+                  .showSnackBar(SnackBar(content: Text('add button')));
+            },
+          )
+        ]));
   }
 }
