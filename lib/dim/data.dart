@@ -21,7 +21,7 @@ class ChatSession {
 class MockDimData extends DimData {
   Future<List<Contact>> getContactList() async {
     return Future.delayed(
-        Duration(milliseconds: 2000),
+        Duration(milliseconds: 300),
         () => List.generate(
             20,
             (i) => Contact('Sickworm',
@@ -30,7 +30,7 @@ class MockDimData extends DimData {
 
   Future<List<ChatSession>> getChatSessionList() async {
     return Future.delayed(
-        Duration(milliseconds: 2000),
+        Duration(milliseconds: 300),
         () => List.generate(
             20,
             (i) => ChatSession(

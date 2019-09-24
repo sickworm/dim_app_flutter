@@ -1,21 +1,24 @@
 import 'package:dim_app_flutter/dim/data.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:indexed_list_view/indexed_list_view.dart';
 
-class ContactListPage extends StatelessWidget {
-  final _controller = IndexedScrollController();
-  final List<Contact> _contactList;
+import 'common_ui.dart';
 
-  ContactListPage(this._contactList);
+class ContactListPage extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() {
+    return _ContactListPageState();
+  }
+}
 
+class _ContactListPageState extends State<ContactListPage> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-            child: IndexedListView.builder(
-                controller: _controller,
-                itemBuilder: (context, i) => _ContactItem(_contactList[i]))));
+    var _futureBuilder = createLoadingFutureBuilder<List<Contact>>(
+        DimDataManager.getInstance().getContactList(),
+        (context, data) =>
+            ListView(children: data.map((c) => _ContactItem(c)).toList()));
+    return Center(child: _futureBuilder);
   }
 }
 
@@ -33,11 +36,11 @@ class _ContactItem extends StatelessWidget {
             _contact.avatar,
           ),
           backgroundColor: Colors.transparent,
-          radius: 32,
+          radius: 20,
         ),
         Text(
           _contact.name,
-          style: const TextStyle(fontSize: 28),
+          style: const TextStyle(fontSize: 20),
         )
       ],
     );

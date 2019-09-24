@@ -29,13 +29,15 @@ class _MainTabState extends State<MainTab> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: Column(children: [
+        body: SafeArea(
+            child: Column(children: [
           _Header(),
-          TabBarView(
+          Expanded(
+              child: TabBarView(
             controller: _tabController,
             children: [ChatListPage(), ContactListPage()],
-          )
-        ]),
+          ))
+        ])),
         bottomNavigationBar: BottomNavigationBar(
             items: [
               const BottomNavigationBarItem(

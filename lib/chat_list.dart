@@ -3,6 +3,8 @@ import 'package:dim_app_flutter/dim/data.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
+import 'common_ui.dart';
+
 final Logger log = new Logger('ChatListPage');
 
 class ChatListPage extends StatefulWidget {
@@ -15,30 +17,11 @@ class ChatListPage extends StatefulWidget {
 class _ChatListPageState extends State<ChatListPage> {
   @override
   Widget build(BuildContext context) {
-    var _futureBuilder = new FutureBuilder(
-      future: DimDataManager.getInstance().getChatSessionList(),
-      builder:
-          (BuildContext context, AsyncSnapshot<List<ChatSession>> snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.none:
-            return Text('Press button to start.');
-          case ConnectionState.active:
-          case ConnectionState.waiting:
-            return Text('Awaiting result...');
-          case ConnectionState.done:
-            if (snapshot.hasError) return Text('Error: ${snapshot.error}');
-            // return Text('Result: ${snapshot.data}');
-            return _contactList(context, snapshot.data);
-        }
-        return null;
-      },
-    );
-    return Scaffold(
-        body: SafeArea(child: Center(child: Expanded(child: _futureBuilder))));
-  }
-
-  _contactList(BuildContext context, List<ChatSession> data) {
-    return ListView(children: data.map((c) => _ChatItem(c)).toList());
+    var _futureBuilder = createLoadingFutureBuilder<List<ChatSession>>(
+        DimDataManager.getInstance().getChatSessionList(),
+        (context, data) =>
+            ListView(children: data.map((c) => _ChatItem(c)).toList()));
+    return Center(child: _futureBuilder);
   }
 }
 
