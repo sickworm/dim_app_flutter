@@ -1,3 +1,5 @@
+import 'package:dim_app_flutter/dim/data.dart';
+import 'package:dim_app_flutter/login/no_login.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'main_tab.dart';
@@ -11,17 +13,17 @@ class LoadingPage extends StatefulWidget {
 }
 
 class _LoadingPageState extends State<LoadingPage> {
-  bool _triggered = false;
-
   @override
   Widget build(BuildContext context) {
-    if (!_triggered) {
-      _triggered = true;
-      Timer(Duration(seconds: 2), () {
+    DimDataManager.getInstance().getLocalUserInfo().then((userData) {
+      if (userData == null) {
         Navigator.pushReplacement(
-            context, new MaterialPageRoute(builder: (context) => MainTab()));
-      });
-    }
+            context, MaterialPageRoute(builder: (context) => NoLoginPage()));
+      } else {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => MainTab()));
+      }
+    });
     return Scaffold(
         body: SafeArea(
       child: Center(

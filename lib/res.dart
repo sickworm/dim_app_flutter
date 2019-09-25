@@ -14,6 +14,7 @@ const blue900 = Color(0xFF0D47A1);
 
 const kColorPrimary = blue600;
 const kColorGray = Color(0xFFF0F0F0);
+const kColorWhite = Colors.white;
 
 const kColorChatMessageSelf = blue400;
 const kColorChatMessageOther = kColorGray;

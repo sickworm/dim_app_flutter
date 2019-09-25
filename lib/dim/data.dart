@@ -26,10 +26,11 @@ abstract class DimData {
   Future<List<Contact>> getContactList();
   Future<List<ChatSession>> getChatSessionList();
   Future<UserInfo> getUserInfo(String userId);
+  Future<UserInfo> getLocalUserInfo();
 }
 
 class MockDimData extends DimData {
-  Future<List<Contact>> getContactList() async {
+  Future<List<Contact>> getContactList() {
     return Future.delayed(
         Duration(milliseconds: 300),
         () => List.generate(
@@ -38,7 +39,7 @@ class MockDimData extends DimData {
                 'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4')));
   }
 
-  Future<List<ChatSession>> getChatSessionList() async {
+  Future<List<ChatSession>> getChatSessionList() {
     return Future.delayed(
         Duration(milliseconds: 300),
         () => List.generate(
@@ -49,7 +50,7 @@ class MockDimData extends DimData {
                 'hi this is a last chat message')));
   }
 
-  Future<UserInfo> getUserInfo(String userId) async {
+  Future<UserInfo> getUserInfo(String userId) {
     return Future.delayed(
         Duration(milliseconds: 300),
         () => UserInfo(
@@ -57,6 +58,10 @@ class MockDimData extends DimData {
             'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
             'sickworm@address',
             'I am Sickworm'));
+  }
+
+  Future<UserInfo> getLocalUserInfo() {
+    return Future.delayed(Duration(milliseconds: 1000), () => null);
   }
 }
 
@@ -78,7 +83,11 @@ class DimDataManager extends DimData {
     return _impl.getChatSessionList();
   }
 
-  Future<UserInfo> getUserInfo(String userId) async {
+  Future<UserInfo> getUserInfo(String userId) {
     return _impl.getUserInfo(userId);
+  }
+
+  Future<UserInfo> getLocalUserInfo() {
+    return _impl.getLocalUserInfo();
   }
 }
