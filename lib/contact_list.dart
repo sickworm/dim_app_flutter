@@ -14,11 +14,10 @@ class ContactListPage extends StatefulWidget {
 class _ContactListPageState extends State<ContactListPage> {
   @override
   Widget build(BuildContext context) {
-    var _futureBuilder = createLoadingFutureBuilder<List<Contact>>(
+    return createLoadingFutureBuilder<List<Contact>>(
         DimDataManager.getInstance().getContactList(),
         (context, data) =>
             ListView(children: data.map((c) => _ContactItem(c)).toList()));
-    return Center(child: _futureBuilder);
   }
 }
 

@@ -1,8 +1,3 @@
-abstract class DimData {
-  Future<List<Contact>> getContactList();
-  Future<List<ChatSession>> getChatSessionList();
-}
-
 class Contact {
   final String name;
   final String avatar;
@@ -16,6 +11,21 @@ class ChatSession {
   final String lastMessage;
 
   ChatSession(this.name, this.avatar, this.lastMessage);
+}
+
+class UserInfo {
+  final String name;
+  final String avatar;
+  final String userId;
+  final String slogan;
+
+  UserInfo(this.name, this.avatar, this.userId, this.slogan);
+}
+
+abstract class DimData {
+  Future<List<Contact>> getContactList();
+  Future<List<ChatSession>> getChatSessionList();
+  Future<UserInfo> getUserInfo(String userId);
 }
 
 class MockDimData extends DimData {
@@ -38,6 +48,16 @@ class MockDimData extends DimData {
                 'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
                 'hi this is a last chat message')));
   }
+
+  Future<UserInfo> getUserInfo(String userId) async {
+    return Future.delayed(
+        Duration(milliseconds: 300),
+        () => UserInfo(
+            'Sickworm',
+            'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
+            'sickworm@address',
+            'I am Sickworm'));
+  }
 }
 
 class DimDataManager extends DimData {
@@ -56,5 +76,9 @@ class DimDataManager extends DimData {
 
   Future<List<ChatSession>> getChatSessionList() {
     return _impl.getChatSessionList();
+  }
+
+  Future<UserInfo> getUserInfo(String userId) async {
+    return _impl.getUserInfo(userId);
   }
 }

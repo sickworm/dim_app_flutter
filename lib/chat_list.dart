@@ -17,11 +17,10 @@ class ChatListPage extends StatefulWidget {
 class _ChatListPageState extends State<ChatListPage> {
   @override
   Widget build(BuildContext context) {
-    var _futureBuilder = createLoadingFutureBuilder<List<ChatSession>>(
+    return createLoadingFutureBuilder<List<ChatSession>>(
         DimDataManager.getInstance().getChatSessionList(),
         (context, data) =>
             ListView(children: data.map((c) => _ChatItem(c)).toList()));
-    return Center(child: _futureBuilder);
   }
 }
 
@@ -35,7 +34,7 @@ class _ChatItem extends StatelessWidget {
     return InkWell(
         onTap: () {
           Navigator.push(context,
-              new MaterialPageRoute(builder: (context) => ChatWindowPage()));
+              MaterialPageRoute(builder: (context) => ChatWindowPage()));
         },
         child: Padding(
             padding: const EdgeInsets.all(8),

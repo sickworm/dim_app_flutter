@@ -1,5 +1,6 @@
 import 'package:dim_app_flutter/contact_list.dart';
 import 'package:dim_app_flutter/res.dart';
+import 'package:dim_app_flutter/user_info.dart';
 import 'package:flutter/material.dart';
 
 import 'chat_list.dart';
@@ -68,12 +69,20 @@ class _Header extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(12),
         child: Row(children: [
-          CircleAvatar(
-            backgroundImage: NetworkImage(
-              'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
+          InkWell(
+            child: CircleAvatar(
+              backgroundImage: NetworkImage(
+                'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
+              ),
+              backgroundColor: Colors.transparent,
+              radius: 32,
             ),
-            backgroundColor: Colors.transparent,
-            radius: 32,
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => UserInfoPage('sickworm')));
+            },
           ),
           const Padding(
               padding: EdgeInsets.only(left: 12),
