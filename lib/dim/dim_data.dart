@@ -38,7 +38,7 @@ abstract class IDimData {
 }
 
 class MockDimData extends IDimData {
-  static const kTestLogin = true;
+  static const kTestLogin = false;
   static const UserInfo kMocklocalUser = UserInfo(
       'Sickworm',
       'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',

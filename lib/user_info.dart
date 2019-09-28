@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dim_app_flutter/common_ui.dart';
 import 'package:dim_app_flutter/dim/dim_data.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +18,7 @@ class UserInfoPage extends StatelessWidget {
               body: SafeArea(
                 child: Column(children: [
                   CircleAvatar(
-                      backgroundImage: NetworkImage(userInfo.avatar),
+                      backgroundImage: FileImage(File(userInfo.avatar)),
                       radius: 24),
                   Text(userInfo.name),
                   Text(userInfo.userId),

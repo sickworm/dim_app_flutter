@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:dim_app_flutter/contact_list.dart';
+import 'package:dim_app_flutter/dim/dim_data.dart';
 import 'package:dim_app_flutter/res.dart';
 import 'package:dim_app_flutter/user_info.dart';
 import 'package:flutter/material.dart';
 
 import 'chat_list.dart';
+import 'common_ui.dart';
 
 class MainTabPage extends StatefulWidget {
   @override
@@ -67,14 +71,19 @@ class _MainTabPageState extends State<MainTabPage>
 class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return createLoadingFutureBuilder<UserInfo>(
+        DimDataManager.getInstance().getLocalUserInfo(),
+        (context, userInfo) => _build(context, userInfo),
+        needLoadingUi: false);
+  }
+
+  Widget _build(BuildContext context, UserInfo userInfo) {
     return Padding(
         padding: const EdgeInsets.all(12),
         child: Row(children: [
           InkWell(
             child: CircleAvatar(
-              backgroundImage: NetworkImage(
-                'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
-              ),
+              backgroundImage: getImageProvider(userInfo.avatar),
               backgroundColor: Colors.transparent,
               radius: 32,
             ),
@@ -82,7 +91,7 @@ class _Header extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => UserInfoPage('sickworm')));
+                      builder: (context) => UserInfoPage(userInfo.userId)));
             },
           ),
           const Padding(
