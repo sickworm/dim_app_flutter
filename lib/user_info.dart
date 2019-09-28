@@ -1,5 +1,5 @@
 import 'package:dim_app_flutter/common_ui.dart';
-import 'package:dim_app_flutter/dim/data.dart';
+import 'package:dim_app_flutter/dim/dim_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 

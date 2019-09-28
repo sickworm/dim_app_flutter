@@ -81,13 +81,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.4"
-  indexed_list_view:
+  image_picker:
     dependency: "direct main"
     description:
-      name: indexed_list_view
+      name: image_picker
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.7"
+    version: "0.6.1+4"
   keyboard_visibility:
     dependency: "direct main"
     description:
@@ -214,4 +214,4 @@ packages:
     version: "3.5.0"
 sdks:
   dart: ">=2.4.0 <3.0.0"
-  flutter: ">=0.1.4 <2.0.0"
+  flutter: ">=1.5.0 <2.0.0"

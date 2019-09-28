@@ -2,7 +2,7 @@ class Contact {
   final String name;
   final String avatar;
 
-  Contact(this.name, this.avatar);
+  const Contact(this.name, this.avatar);
 }
 
 class ChatSession {
@@ -10,7 +10,7 @@ class ChatSession {
   final String avatar;
   final String lastMessage;
 
-  ChatSession(this.name, this.avatar, this.lastMessage);
+  const ChatSession(this.name, this.avatar, this.lastMessage);
 }
 
 class UserInfo {
@@ -19,17 +19,33 @@ class UserInfo {
   final String userId;
   final String slogan;
 
-  UserInfo(this.name, this.avatar, this.userId, this.slogan);
+  const UserInfo(this.name, this.avatar, this.userId, this.slogan);
 }
 
-abstract class DimData {
+class LocalUserKey {
+  final String userId;
+  final String keyData; // json
+
+  const LocalUserKey(this.userId, this.keyData);
+}
+
+abstract class IDimData {
   Future<List<Contact>> getContactList();
   Future<List<ChatSession>> getChatSessionList();
   Future<UserInfo> getUserInfo(String userId);
   Future<UserInfo> getLocalUserInfo();
+  Future<void> setLocalUserInfo(UserInfo userInfo, LocalUserKey key);
 }
 
-class MockDimData extends DimData {
+class MockDimData extends IDimData {
+  static const kTestLogin = true;
+  static const UserInfo kMocklocalUser = UserInfo(
+      'Sickworm',
+      'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
+      'sickworm@address',
+      'I am Sickworm');
+  UserInfo _localUser = kTestLogin ? null : kMocklocalUser;
+
   Future<List<Contact>> getContactList() {
     return Future.delayed(
         Duration(milliseconds: 300),
@@ -51,27 +67,26 @@ class MockDimData extends DimData {
   }
 
   Future<UserInfo> getUserInfo(String userId) {
-    return Future.delayed(
-        Duration(milliseconds: 300),
-        () => UserInfo(
-            'Sickworm',
-            'https://avatars3.githubusercontent.com/u/2757460?s=460&v=4',
-            'sickworm@address',
-            'I am Sickworm'));
+    return Future.delayed(Duration(milliseconds: 300), () => _localUser);
   }
 
   Future<UserInfo> getLocalUserInfo() {
-    return Future.delayed(Duration(milliseconds: 1000), () => null);
+    return Future.delayed(Duration(milliseconds: 1000), () => _localUser);
+  }
+
+  Future<void> setLocalUserInfo(UserInfo userInfo, LocalUserKey key) {
+    return Future.delayed(
+        Duration(milliseconds: 50), () => _localUser = userInfo);
   }
 }
 
-class DimDataManager extends DimData {
+class DimDataManager extends IDimData {
   static DimDataManager _instance = new DimDataManager._();
   static DimDataManager getInstance() {
     return _instance;
   }
 
-  DimData _impl = MockDimData();
+  IDimData _impl = MockDimData();
 
   DimDataManager._();
 
@@ -88,6 +103,10 @@ class DimDataManager extends DimData {
   }
 
   Future<UserInfo> getLocalUserInfo() {
+    return _impl.getLocalUserInfo();
+  }
+
+  Future<void> setLocalUserInfo(UserInfo userInfo, LocalUserKey key) {
     return _impl.getLocalUserInfo();
   }
 }

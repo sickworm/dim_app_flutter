@@ -233,9 +233,9 @@ class _TextInputBarState extends State<_TextInputBar> {
         padding: EdgeInsets.all(2),
         decoration: const BoxDecoration(
             boxShadow: [BoxShadow(color: kColorShadow, blurRadius: 6.0)],
-            color: kColorGray),
+            color: kColorGrayBackground),
         child: Material(
-            color: kColorGray,
+            color: kColorGrayBackground,
             child: Row(children: [
               InkWell(
                   child: IconButton(

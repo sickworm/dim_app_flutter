@@ -5,14 +5,15 @@ import 'package:flutter/material.dart';
 
 import 'chat_list.dart';
 
-class MainTab extends StatefulWidget {
+class MainTabPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    return _MainTabState();
+    return _MainTabPageState();
   }
 }
 
-class _MainTabState extends State<MainTab> with SingleTickerProviderStateMixin {
+class _MainTabPageState extends State<MainTabPage>
+    with SingleTickerProviderStateMixin {
   TabController _tabController;
   int _tabIndex = 0;
 

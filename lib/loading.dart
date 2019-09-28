@@ -1,7 +1,6 @@
-import 'package:dim_app_flutter/dim/data.dart';
-import 'package:dim_app_flutter/login/no_login.dart';
+import 'package:dim_app_flutter/dim/dim_data.dart';
+import 'package:dim_app_flutter/login/login.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
 import 'main_tab.dart';
 import 'res.dart';
 
@@ -18,10 +17,10 @@ class _LoadingPageState extends State<LoadingPage> {
     DimDataManager.getInstance().getLocalUserInfo().then((userData) {
       if (userData == null) {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => NoLoginPage()));
+            context, MaterialPageRoute(builder: (context) => LoginPage()));
       } else {
         Navigator.pushReplacement(
-            context, MaterialPageRoute(builder: (context) => MainTab()));
+            context, MaterialPageRoute(builder: (context) => MainTabPage()));
       }
     });
     return Scaffold(

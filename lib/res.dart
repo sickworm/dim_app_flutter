@@ -13,10 +13,11 @@ const blue800 = Color(0xFF1565C0);
 const blue900 = Color(0xFF0D47A1);
 
 const kColorPrimary = blue600;
-const kColorGray = Color(0xFFF0F0F0);
+const kColorGrayBackground = Color(0xFFF0F0F0);
+const kColorGrayText = Color(0xFF808080);
 const kColorWhite = Colors.white;
 
 const kColorChatMessageSelf = blue400;
-const kColorChatMessageOther = kColorGray;
+const kColorChatMessageOther = kColorGrayBackground;
 const kColorShadow = Color(0x70000000);
 const kColorIcon = Color(0x70000000);
