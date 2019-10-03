@@ -1,4 +1,4 @@
-import 'package:dim_app_flutter/dim/dim.dart';
+import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:dim_app_flutter/res.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +20,7 @@ class _ChatWindowPageState extends State<StatefulWidget>
       20,
       (i) =>
           _ChatData(Content(ContentType.Text, 'hello ${i + 1}'), i % 2 == 0));
-  final _dimManager = DimManager.getInstance();
+  final _dimManager = DimClient.getInstance();
   final _scrollController = ScrollController();
   OnReceive _dimListener;
   int _keyboardListenerId;

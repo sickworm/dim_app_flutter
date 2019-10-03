@@ -1,4 +1,4 @@
-import 'package:dim_app_flutter/dim/dim_data.dart';
+import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

@@ -1,7 +1,5 @@
-import 'dart:io';
-
 import 'package:dim_app_flutter/contact_list.dart';
-import 'package:dim_app_flutter/dim/dim_data.dart';
+import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:dim_app_flutter/res.dart';
 import 'package:dim_app_flutter/user_info.dart';
 import 'package:flutter/material.dart';

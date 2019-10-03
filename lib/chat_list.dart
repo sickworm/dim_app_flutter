@@ -1,5 +1,5 @@
 import 'package:dim_app_flutter/chat_window.dart';
-import 'package:dim_app_flutter/dim/dim_data.dart';
+import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 

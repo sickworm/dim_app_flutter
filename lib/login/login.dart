@@ -1,7 +1,6 @@
 import 'dart:io';
 
-import 'package:dim_app_flutter/dim/dim_data.dart';
-import 'package:dim_app_flutter/dim/dim_utils.dart';
+import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -181,7 +180,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     var key = await DimUtils.createLocalUserKey();
     var userInfo =
         UserInfo(_controller.text, _image.toString(), key.userId, '');
-    await DimDataManager.getInstance().setLocalUserInfo(userInfo, key);
+    await DimDataManager.getInstance().setLocalUser(userInfo, key);
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => MainTabPage()));
   }
