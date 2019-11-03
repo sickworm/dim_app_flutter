@@ -8,20 +8,24 @@ import 'package:logging/logging.dart';
 final Logger log = new Logger('ChatWindowPage');
 
 class ChatWindowPage extends StatefulWidget {
+  final ChatSession chatSession;
+
+  ChatWindowPage(this.chatSession);
+
   @override
   State<StatefulWidget> createState() {
     return _ChatWindowPageState();
   }
 }
 
-class _ChatWindowPageState extends State<StatefulWidget>
+class _ChatWindowPageState extends State<ChatWindowPage>
     with WidgetsBindingObserver {
-  final testData = List.generate(
-      20,
-      (i) =>
-          _ChatData(Content(ContentType.Text, 'hello ${i + 1}'), i % 2 == 0));
-  final _dimManager = DimClient.getInstance();
+  final _dimClient = DimClient.getInstance();
+  final _dimData = DimDataManager.getInstance();
   final _scrollController = ScrollController();
+
+  List<ChatMessage> _chatMessages = List();
+
   OnReceive _dimListener;
   int _keyboardListenerId;
   bool _needScroll = false;
@@ -33,11 +37,15 @@ class _ChatWindowPageState extends State<StatefulWidget>
     _dimListener = (content) {
       setState(() {
         log.info('receive $content');
-        testData.add(_ChatData(content, false));
-        _needScroll = true;
+        _dimData.addChatMessage(
+            widget.chatSession.sessionId,
+            ChatMessage.build(content, widget.chatSession.userInfo.userId,
+                DateTime.now().millisecondsSinceEpoch,
+                isSelf: false, isSent: true));
+        _reloadChatMessages();
       });
     };
-    _dimManager.addListener(_dimListener);
+    _dimClient.addListener(_dimListener);
 
     _keyboardListenerId = KeyboardVisibilityNotification().addNewListener(
       onChange: (bool visible) {
@@ -48,12 +56,26 @@ class _ChatWindowPageState extends State<StatefulWidget>
         }
       },
     );
+
+    _reloadChatMessages(needJump: true);
+  }
+
+  void _reloadChatMessages({bool needJump = false}) {
+    _dimData.getChatMessages(widget.chatSession.sessionId).then((chatMessages) {
+      setState(() {
+        _chatMessages = chatMessages;
+        if (needJump) {
+          _needJump = true;
+        }
+        _needScroll = true;
+      });
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    _dimManager.removeListener(_dimListener);
+    _dimClient.removeListener(_dimListener);
     KeyboardVisibilityNotification().removeListener(_keyboardListenerId);
   }
 
@@ -69,17 +91,25 @@ class _ChatWindowPageState extends State<StatefulWidget>
               height: 1,
               color: Colors.black26,
               margin: const EdgeInsets.only(left: 8, right: 8)),
-          _ChatMessageList(testData, _scrollController),
+          _ChatMessageList(_chatMessages, _scrollController),
           _TextInputBar((content) {
-            var chatData = _ChatData(content, true, isLoading: true);
-            setState(() {
-              testData.add(chatData);
-              _needScroll = true;
+            var chatData = ChatMessage.build(
+                content,
+                widget.chatSession.userInfo.userId,
+                DateTime.now().millisecondsSinceEpoch,
+                isSelf: true);
+            _dimData
+                .addChatMessage(widget.chatSession.sessionId, chatData)
+                .then((v) {
+              _reloadChatMessages();
             });
-            _dimManager.send(content).then((value) {
+            _dimClient.send(content).then((value) {
               print('send $content');
-              setState(() {
-                chatData.isLoading = false;
+              _dimData
+                  .addChatMessage(widget.chatSession.sessionId,
+                      chatData.renewWithState(isSent: true))
+                  .then((v) {
+                _reloadChatMessages();
               });
             });
           })
@@ -128,7 +158,7 @@ class _Header extends StatelessWidget {
 }
 
 class _ChatMessageList extends StatelessWidget {
-  final List<_ChatData> _list;
+  final List<ChatMessage> _list;
   final ScrollController _scrollController;
 
   _ChatMessageList(this._list, this._scrollController);
@@ -142,15 +172,8 @@ class _ChatMessageList extends StatelessWidget {
   }
 }
 
-class _ChatData {
-  final Content content;
-  final bool isSelf;
-  bool isLoading;
-  _ChatData(this.content, this.isSelf, {this.isLoading = false});
-}
-
 class _ChatMessage extends StatelessWidget {
-  final _ChatData chatData;
+  final ChatMessage chatData;
 
   _ChatMessage(this.chatData);
 
@@ -159,7 +182,7 @@ class _ChatMessage extends StatelessWidget {
     var items = <Widget>[];
     if (chatData.isSelf) {
       items.add(const Flexible(fit: FlexFit.tight, child: SizedBox()));
-      if (chatData.isLoading) {
+      if (!chatData.isSent) {
         items.add(CupertinoActivityIndicator());
       }
     }
@@ -171,7 +194,7 @@ class _ChatMessage extends StatelessWidget {
         child: Text(chatData.content.data)));
 
     if (!chatData.isSelf) {
-      if (chatData.isLoading) {
+      if (!chatData.isSent) {
         items.add(CupertinoActivityIndicator());
       }
       items.add(const Flexible(fit: FlexFit.tight, child: SizedBox()));

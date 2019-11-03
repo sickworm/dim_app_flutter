@@ -33,14 +33,16 @@ class _ChatItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ChatWindowPage()));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ChatWindowPage(_chatSession)));
         },
         child: Padding(
             padding: const EdgeInsets.all(8),
             child: Row(children: <Widget>[
               CircleAvatar(
-                backgroundImage: NetworkImage(_chatSession.avatar),
+                backgroundImage: NetworkImage(_chatSession.userInfo.avatar),
                 backgroundColor: Colors.transparent,
                 radius: 24,
               ),
@@ -49,7 +51,7 @@ class _ChatItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(_chatSession.name,
+                      Text(_chatSession.userInfo.name,
                           maxLines: 1, style: const TextStyle(fontSize: 18)),
                       Padding(
                           padding: EdgeInsets.only(top: 4),
