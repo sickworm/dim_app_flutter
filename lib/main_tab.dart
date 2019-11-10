@@ -92,12 +92,12 @@ class _Header extends StatelessWidget {
                       builder: (context) => UserInfoPage(userInfo.userId)));
             },
           ),
-          const Padding(
-              padding: EdgeInsets.only(left: 12),
-              child: Text('Sickworm', style: const TextStyle(fontSize: 28))),
+          Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Text(userInfo.name, style: const TextStyle(fontSize: 28))),
           const Flexible(fit: FlexFit.tight, child: SizedBox()),
           IconButton(
-            icon: Icon(Icons.add, size: 32),
+            icon: const Icon(Icons.add, size: 32),
             onPressed: () {
               Scaffold.of(context)
                   .showSnackBar(SnackBar(content: Text('add button')));

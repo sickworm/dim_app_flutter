@@ -180,7 +180,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     var key = await DimUtils.createLocalUserKey();
     var userInfo =
         UserInfo(_controller.text, _image.toString(), key.userId, '');
-    await DimDataManager.getInstance().setLocalUser(userInfo, key);
+    await DimDataManager.getInstance().setLocalUserInfo(userInfo, key);
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => MainTabPage()));
   }
