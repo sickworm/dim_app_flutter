@@ -36,7 +36,8 @@ class _ChatItem extends StatelessWidget {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => ChatWindowPage(_chatSession)));
+                  builder: (context) => ChatWindowPage(
+                      _chatSession.sessionId, _chatSession.userInfo)));
         },
         child: Padding(
             padding: const EdgeInsets.all(8),

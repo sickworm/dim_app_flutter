@@ -2,6 +2,7 @@ import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'chat_window.dart';
 import 'common_ui.dart';
 
 class ContactListPage extends StatefulWidget {
@@ -14,7 +15,7 @@ class ContactListPage extends StatefulWidget {
 class _ContactListPageState extends State<ContactListPage> {
   @override
   Widget build(BuildContext context) {
-    return createLoadingFutureBuilder<List<Contact>>(
+    return createLoadingFutureBuilder<List<UserInfo>>(
         DimDataManager.getInstance().getContactList(),
         (context, data) =>
             ListView(children: data.map((c) => _ContactItem(c)).toList()));
@@ -22,26 +23,38 @@ class _ContactListPageState extends State<ContactListPage> {
 }
 
 class _ContactItem extends StatelessWidget {
-  final Contact _contact;
+  final UserInfo userInfo;
 
-  _ContactItem(this._contact);
+  _ContactItem(this.userInfo);
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: <Widget>[
-        CircleAvatar(
-          backgroundImage: NetworkImage(
-            _contact.avatar,
-          ),
-          backgroundColor: Colors.transparent,
-          radius: 20,
-        ),
-        Text(
-          _contact.name,
-          style: const TextStyle(fontSize: 20),
-        )
-      ],
-    );
+    return InkWell(
+        onTap: () {
+          DimDataManager.getInstance()
+              .getChatSessionId(userInfo.userId)
+              .then((sessionId) => {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                ChatWindowPage(sessionId, userInfo)))
+                  });
+        },
+        child: Row(
+          children: <Widget>[
+            CircleAvatar(
+              backgroundImage: NetworkImage(
+                userInfo.avatar,
+              ),
+              backgroundColor: Colors.transparent,
+              radius: 20,
+            ),
+            Text(
+              userInfo.name,
+              style: const TextStyle(fontSize: 20),
+            )
+          ],
+        ));
   }
 }

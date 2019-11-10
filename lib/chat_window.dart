@@ -8,9 +8,10 @@ import 'package:logging/logging.dart';
 final Logger log = new Logger('ChatWindowPage');
 
 class ChatWindowPage extends StatefulWidget {
-  final ChatSession chatSession;
+  final String sessionId;
+  final UserInfo userInfo;
 
-  ChatWindowPage(this.chatSession);
+  ChatWindowPage(this.sessionId, this.userInfo);
 
   @override
   State<StatefulWidget> createState() {
@@ -38,8 +39,8 @@ class _ChatWindowPageState extends State<ChatWindowPage>
       setState(() {
         log.info('receive $content');
         _dimData.addChatMessage(
-            widget.chatSession.sessionId,
-            ChatMessage.build(content, widget.chatSession.userInfo.userId,
+            widget.sessionId,
+            ChatMessage.build(content, widget.userInfo.userId,
                 DateTime.now().millisecondsSinceEpoch,
                 isSelf: false, isSent: true));
         _reloadChatMessages();
@@ -61,7 +62,7 @@ class _ChatWindowPageState extends State<ChatWindowPage>
   }
 
   void _reloadChatMessages({bool needJump = false}) {
-    _dimData.getChatMessages(widget.chatSession.sessionId).then((chatMessages) {
+    _dimData.getChatMessages(widget.sessionId).then((chatMessages) {
       setState(() {
         _chatMessages = chatMessages;
         if (needJump) {
@@ -93,21 +94,17 @@ class _ChatWindowPageState extends State<ChatWindowPage>
               margin: const EdgeInsets.only(left: 8, right: 8)),
           _ChatMessageList(_chatMessages, _scrollController),
           _TextInputBar((content) {
-            var chatData = ChatMessage.build(
-                content,
-                widget.chatSession.userInfo.userId,
+            var chatData = ChatMessage.build(content, widget.userInfo.userId,
                 DateTime.now().millisecondsSinceEpoch,
                 isSelf: true);
-            _dimData
-                .addChatMessage(widget.chatSession.sessionId, chatData)
-                .then((v) {
+            _dimData.addChatMessage(widget.sessionId, chatData).then((v) {
               _reloadChatMessages();
             });
             _dimClient.send(content).then((value) {
               print('send $content');
               _dimData
-                  .addChatMessage(widget.chatSession.sessionId,
-                      chatData.renewWithState(isSent: true))
+                  .addChatMessage(
+                      widget.sessionId, chatData.renewWithState(isSent: true))
                   .then((v) {
                 _reloadChatMessages();
               });
