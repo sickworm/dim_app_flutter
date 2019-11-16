@@ -24,6 +24,7 @@ class _ChatWindowPageState extends State<ChatWindowPage>
   final _dimClient = DimClient.getInstance();
   final _dimData = DimDataManager.getInstance();
   final _scrollController = ScrollController();
+  UserInfo _localUserInfo;
 
   List<ChatMessage> _chatMessages = List();
 
@@ -40,8 +41,8 @@ class _ChatWindowPageState extends State<ChatWindowPage>
         log.info('receive $content');
         _dimData.addChatMessage(
             widget.sessionId,
-            ChatMessage.build(content, widget.userInfo.userId,
-                DateTime.now().millisecondsSinceEpoch,
+            ChatMessage.build(content, _localUserInfo.userId,
+                widget.userInfo.userId, DateTime.now().millisecondsSinceEpoch,
                 isSelf: false, isSent: true));
         _reloadChatMessages();
       });
@@ -57,6 +58,8 @@ class _ChatWindowPageState extends State<ChatWindowPage>
         }
       },
     );
+
+    _dimData.getLocalUserInfo().then((userInfo) => _localUserInfo = userInfo);
 
     _reloadChatMessages(needJump: true);
   }
@@ -87,20 +90,20 @@ class _ChatWindowPageState extends State<ChatWindowPage>
         resizeToAvoidBottomInset: true,
         body: SafeArea(
             child: Column(children: [
-          _Header('Sickworm'),
+          _Header(widget.userInfo.name),
           Container(
               height: 1,
               color: Colors.black26,
               margin: const EdgeInsets.only(left: 8, right: 8)),
           _ChatMessageList(_chatMessages, _scrollController),
           _TextInputBar((content) {
-            var chatData = ChatMessage.build(content, widget.userInfo.userId,
-                DateTime.now().millisecondsSinceEpoch,
+            var chatData = ChatMessage.build(content, _localUserInfo.userId,
+                widget.userInfo.userId, DateTime.now().millisecondsSinceEpoch,
                 isSelf: true);
             _dimData.addChatMessage(widget.sessionId, chatData).then((v) {
               _reloadChatMessages();
             });
-            _dimClient.send(content).then((value) {
+            _dimClient.send(content, widget.userInfo.userId).then((value) {
               print('send $content');
               _dimData
                   .addChatMessage(

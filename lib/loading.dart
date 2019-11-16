@@ -13,8 +13,13 @@ class LoadingPage extends StatefulWidget {
 
 class _LoadingPageState extends State<LoadingPage> {
   @override
-  Widget build(BuildContext context) {
-    DimDataManager.getInstance().getLocalUserInfo().then((userData) {
+  void initState() {
+    super.initState();
+    () async {
+      var launchJob = DimClient.getInstance().launch(null);
+      var userJob = DimDataManager.getInstance().getLocalUserInfo();
+      await launchJob;
+      var userData = await userJob;
       if (userData == null) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginPage()));
@@ -22,7 +27,11 @@ class _LoadingPageState extends State<LoadingPage> {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => MainTabPage()));
       }
-    });
+    }();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
         body: SafeArea(
       child: Center(

@@ -30,8 +30,8 @@ class _ContactItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () {
-          DimDataManager.getInstance()
+        onTap: () async {
+          await DimDataManager.getInstance()
               .getChatSessionId(userInfo.userId)
               .then((sessionId) => {
                     Navigator.push(
