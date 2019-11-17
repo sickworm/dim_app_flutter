@@ -36,14 +36,9 @@ class _ChatWindowPageState extends State<ChatWindowPage>
   @override
   void initState() {
     super.initState();
-    _dimListener = (content) {
+    _dimListener = (chatMessage) {
       setState(() {
-        log.info('receive $content');
-        _dimData.addChatMessage(
-            widget.sessionId,
-            ChatMessage.build(content, _localUserInfo.userId,
-                widget.userInfo.userId, DateTime.now().millisecondsSinceEpoch,
-                isSelf: false, isSent: true));
+        _dimData.addChatMessage(chatMessage);
         _reloadChatMessages();
       });
     };
@@ -97,18 +92,19 @@ class _ChatWindowPageState extends State<ChatWindowPage>
               margin: const EdgeInsets.only(left: 8, right: 8)),
           _ChatMessageList(_chatMessages, _scrollController),
           _TextInputBar((content) {
-            var chatData = ChatMessage.build(content, _localUserInfo.userId,
-                widget.userInfo.userId, DateTime.now().millisecondsSinceEpoch,
+            var chatData = ChatMessage(
+                widget.sessionId,
+                content,
+                _localUserInfo.userId,
+                widget.userInfo.userId,
+                DateTime.now().millisecondsSinceEpoch,
                 isSelf: true);
-            _dimData.addChatMessage(widget.sessionId, chatData).then((v) {
+            _dimData.addChatMessage(chatData).then((v) {
               _reloadChatMessages();
             });
-            _dimClient.send(content, widget.userInfo.userId).then((value) {
+            _dimClient.send(chatData).then((value) {
               print('send $content');
-              _dimData
-                  .addChatMessage(
-                      widget.sessionId, chatData.renewWithState(isSent: true))
-                  .then((v) {
+              _dimData.addChatMessage(chatData.copy(isSent: true)).then((v) {
                 _reloadChatMessages();
               });
             });
