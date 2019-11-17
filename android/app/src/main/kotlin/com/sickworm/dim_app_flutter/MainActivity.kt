@@ -1,4 +1,4 @@
-package com.example.dim_app_flutter
+package com.sickworm.dim_app_flutter
 
 import android.os.Bundle
 
