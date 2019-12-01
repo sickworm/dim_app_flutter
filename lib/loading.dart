@@ -16,14 +16,16 @@ class _LoadingPageState extends State<LoadingPage> {
   void initState() {
     super.initState();
     () async {
-      var launchJob = DimClient.getInstance().launch(null);
-      var userJob = DimDataManager.getInstance().getLocalUserInfo();
-      await launchJob;
-      var userData = await userJob;
-      if (userData == null) {
+      await Future.wait([
+        DimDataManager.getInstance().init(),
+        DimClient.getInstance().launch(null)
+      ]);
+      var userInfo = await DimDataManager.getInstance().getLocalUserInfo();
+      if (true || userInfo == null) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginPage()));
       } else {
+        await DimClient.getInstance().login(userInfo);
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => MainTabPage()));
       }

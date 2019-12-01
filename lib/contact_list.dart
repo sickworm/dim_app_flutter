@@ -16,9 +16,15 @@ class _ContactListPageState extends State<ContactListPage> {
   @override
   Widget build(BuildContext context) {
     return createLoadingFutureBuilder<List<UserInfo>>(
-        DimDataManager.getInstance().getContactList(),
+        _getContactList(),
         (context, data) =>
             ListView(children: data.map((c) => _ContactItem(c)).toList()));
+  }
+
+  Future<List<UserInfo>> _getContactList() async {
+    final result = await DimDataManager.getInstance().getContactList();
+    return Future.wait(result
+        .map((userId) => DimDataManager.getInstance().getUserInfo(userId)));
   }
 }
 

@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 typedef OnFinish<T> = Function(BuildContext context, T snapshot);
 
 FutureBuilder createLoadingFutureBuilder<T>(
-    Future<T> futrue, OnFinish<T> onFinish,
+    Future<T> future, OnFinish<T> onFinish,
     {needLoadingUi: true}) {
   return new FutureBuilder(
-      future: futrue,
+      future: future,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         switch (snapshot.connectionState) {
           case ConnectionState.none:
