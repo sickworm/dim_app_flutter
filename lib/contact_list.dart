@@ -1,9 +1,12 @@
 import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 
 import 'chat_window.dart';
 import 'common_ui.dart';
+
+final Logger log = new Logger('ContactListPage');
 
 class ContactListPage extends StatefulWidget {
   @override
@@ -13,6 +16,12 @@ class ContactListPage extends StatefulWidget {
 }
 
 class _ContactListPageState extends State<ContactListPage> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return createLoadingFutureBuilder<List<UserInfo>>(

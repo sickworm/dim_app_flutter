@@ -21,7 +21,7 @@ class _LoadingPageState extends State<LoadingPage> {
         DimClient.getInstance().launch(null)
       ]);
       var userInfo = await DimDataManager.getInstance().getLocalUserInfo();
-      if (true || userInfo == null) {
+      if (userInfo == null) {
         Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => LoginPage()));
       } else {
