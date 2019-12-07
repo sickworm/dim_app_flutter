@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
 import 'chat_window.dart';
-import 'common_ui.dart';
 
 final Logger log = new Logger('ContactListPage');
 
@@ -17,23 +16,26 @@ class ContactListPage extends StatefulWidget {
 
 class _ContactListPageState extends State<ContactListPage> {
 
+  var contactList = List<UserInfo>();
+
   @override
   void initState() {
     super.initState();
+    _getContactList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return createLoadingFutureBuilder<List<UserInfo>>(
-        _getContactList(),
-        (context, data) =>
-            ListView(children: data.map((c) => _ContactItem(c)).toList()));
+    return ListView(children: contactList.map((c) => _ContactItem(c)).toList());
   }
 
-  Future<List<UserInfo>> _getContactList() async {
+  _getContactList() async {
     final result = await DimDataManager.getInstance().getContactList();
-    return Future.wait(result
+    var contactList = await Future.wait(result
         .map((userId) => DimDataManager.getInstance().getUserInfo(userId)));
+    setState(() {
+      this.contactList = contactList;
+    });
   }
 }
 

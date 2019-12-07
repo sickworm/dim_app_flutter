@@ -66,16 +66,33 @@ class _MainTabPageState extends State<MainTabPage>
   }
 }
 
-class _Header extends StatelessWidget {
+class _Header extends StatefulWidget {
+
   @override
-  Widget build(BuildContext context) {
-    return createLoadingFutureBuilder<UserInfo>(
-        DimDataManager.getInstance().getLocalUserInfo(),
-        (context, userInfo) => _build(context, userInfo),
-        needLoadingUi: false);
+  State<StatefulWidget> createState() {
+    return _HeaderState();
+  }
+}
+
+class _HeaderState extends State<_Header> {
+
+  static const emptyUserInfo = UserInfo("", "", "", "");
+
+  UserInfo userInfo = emptyUserInfo;
+
+  @override
+  void initState() {
+    super.initState();
+
+    DimDataManager.getInstance().getLocalUserInfo().then((userInfo) {
+      setState(() {
+        this.userInfo = userInfo;
+      });
+    });
   }
 
-  Widget _build(BuildContext context, UserInfo userInfo) {
+  @override
+  Widget build(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(12),
         child: Row(children: [

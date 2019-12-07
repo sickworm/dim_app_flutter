@@ -3,8 +3,6 @@ import 'package:dim_sdk_flutter/dim_sdk_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 
-import 'common_ui.dart';
-
 final Logger log = new Logger('ChatListPage');
 
 class ChatListPage extends StatefulWidget {
@@ -15,12 +13,23 @@ class ChatListPage extends StatefulWidget {
 }
 
 class _ChatListPageState extends State<ChatListPage> {
+
+  var sessionList = List<ChatSession>();
+
+  @override
+  void initState() {
+    super.initState();
+
+    DimDataManager.getInstance().getChatSessionList().then((sessionList) {
+      setState(() {
+        this.sessionList = sessionList;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return createLoadingFutureBuilder<List<ChatSession>>(
-        DimDataManager.getInstance().getChatSessionList(),
-        (context, data) =>
-            ListView(children: data.map((c) => _ChatItem(c)).toList()));
+    return ListView(children: sessionList.map((c) => _ChatItem(c)).toList());
   }
 }
 
