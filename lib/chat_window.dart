@@ -36,11 +36,9 @@ class _ChatWindowPageState extends State<ChatWindowPage>
   @override
   void initState() {
     super.initState();
-    _dimListener = (chatMessage) {
-      setState(() {
-        _dimData.addChatMessage(chatMessage);
-        _reloadChatMessages();
-      });
+    _dimListener = (chatMessage) async {
+      await _dimData.addChatMessage(chatMessage);
+      _reloadChatMessages();
     };
     _dimClient.addListener(_dimListener);
 
@@ -91,7 +89,7 @@ class _ChatWindowPageState extends State<ChatWindowPage>
               color: Colors.black26,
               margin: const EdgeInsets.only(left: 8, right: 8)),
           _ChatMessageList(_chatMessages, _scrollController),
-          _TextInputBar((content) {
+          _TextInputBar((content) async {
             var chatData = ChatMessage(
                 widget.sessionId,
                 content,
@@ -99,15 +97,12 @@ class _ChatWindowPageState extends State<ChatWindowPage>
                 widget.userInfo.userId,
                 DateTime.now().millisecondsSinceEpoch,
                 isSelf: true);
-            _dimData.addChatMessage(chatData).then((v) {
-              _reloadChatMessages();
-            });
-            _dimClient.send(chatData).then((value) {
-              print('send $content');
-              _dimData.addChatMessage(chatData.copy(isSent: true)).then((v) {
-                _reloadChatMessages();
-              });
-            });
+            await _dimData.addChatMessage(chatData);
+            print('send $content');
+            await _dimClient.send(chatData);
+            print('sent $content');
+            await _dimData.addChatMessage(chatData.copy(isSent: true));
+            _reloadChatMessages();
           })
         ])));
   }
