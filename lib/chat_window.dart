@@ -52,21 +52,26 @@ class _ChatWindowPageState extends State<ChatWindowPage>
       },
     );
 
-    _dimData.getLocalUserInfo().then((userInfo) => _localUserInfo = userInfo);
-
-    _reloadChatMessages(needJump: true);
+    _dimData.getLocalUserInfo().then((localUserInfo) {
+        _localUserInfo = localUserInfo;
+        _reloadChatMessages(needJump: true);
+    });
   }
 
-  void _reloadChatMessages({bool needJump = false}) {
-    _dimData.getChatMessages(widget.sessionId).then((chatMessages) {
-      setState(() {
+  void _reloadChatMessages({bool needJump = false}) async {
+    final chatMessages = await _dimData.getChatMessages(widget.sessionId);
+
+    final lastMessage = chatMessages.length == 0? "" : chatMessages.last.content.data;
+    _dimData.addSession(ChatSession(
+        widget.userInfo.userId, widget.sessionId,
+        lastMessage, DateTime.now().millisecondsSinceEpoch));
+    setState(() {
         _chatMessages = chatMessages;
         if (needJump) {
           _needJump = true;
         }
         _needScroll = true;
       });
-    });
   }
 
   @override

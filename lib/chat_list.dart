@@ -15,28 +15,36 @@ class ChatListPage extends StatefulWidget {
 class _ChatListPageState extends State<ChatListPage> {
 
   var sessionList = List<ChatSession>();
+  var userInfoList = List<UserInfo>();
 
   @override
   void initState() {
     super.initState();
+    _initData();
+  }
 
-    DimDataManager.getInstance().getChatSessionList().then((sessionList) {
-      setState(() {
-        this.sessionList = sessionList;
-      });
+  void _initData() async {
+    final sessionList = await DimDataManager.getInstance().getChatSessionList();
+    final userInfoList = await Future.wait(sessionList.map((s) =>
+        DimDataManager.getInstance().getUserInfo(s.userId)));
+    setState(() {
+      this.sessionList = sessionList;
+      this.userInfoList = userInfoList;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return ListView(children: sessionList.map((c) => _ChatItem(c)).toList());
+    return ListView(children: sessionList.map((c) => _ChatItem(c,
+      userInfoList.firstWhere((u) => c.userId == u.userId))).toList());
   }
 }
 
 class _ChatItem extends StatelessWidget {
   final ChatSession _chatSession;
+  final UserInfo _userInfo;
 
-  _ChatItem(this._chatSession);
+  _ChatItem(this._chatSession, this._userInfo);
 
   @override
   Widget build(BuildContext context) {
@@ -46,13 +54,13 @@ class _ChatItem extends StatelessWidget {
               context,
               MaterialPageRoute(
                   builder: (context) => ChatWindowPage(
-                      _chatSession.sessionId, _chatSession.userInfo)));
+                      _chatSession.sessionId, _userInfo)));
         },
         child: Padding(
             padding: const EdgeInsets.all(8),
             child: Row(children: <Widget>[
               CircleAvatar(
-                backgroundImage: NetworkImage(_chatSession.userInfo.avatar),
+                backgroundImage: NetworkImage(_userInfo.avatar),
                 backgroundColor: Colors.transparent,
                 radius: 24,
               ),
@@ -61,7 +69,7 @@ class _ChatItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(_chatSession.userInfo.name,
+                      Text(_userInfo.name,
                           maxLines: 1, style: const TextStyle(fontSize: 18)),
                       Padding(
                           padding: EdgeInsets.only(top: 4),
